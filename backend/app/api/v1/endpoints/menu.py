@@ -18,6 +18,12 @@ from app.services.menu_service import MenuService
 router = APIRouter()
 
 
+@router.get("/customer", response_model=ApiResponse[list[MenuCategoryWithItems]])
+def customer_menu(db: DbDep):
+    service = MenuService()
+    return ApiResponse(data=service.get_customer_menu(db))
+
+
 @router.get("/categories", response_model=ApiResponse[list[MenuCategoryRead]])
 def list_categories(db: DbDep):
     service = MenuService()

@@ -21,13 +21,20 @@ class MenuService:
         return self.category_repository.create(db, data.model_dump())
 
     def list_categories(self, db: Session, include_items: bool = False) -> list[MenuCategory]:
+        return self.list_categories_full(db, include_items=include_items)
+
+    def list_categories_full(self, db: Session, *, include_items: bool = False, available_only: bool = False) -> list[MenuCategory]:
         categories = self.category_repository.get_active(db)
         if include_items:
             for category in categories:
-                category.items = [
-                    item for item in category.items if item.is_enabled and item.is_available
-                ]
+                items = [item for item in category.items if item.deleted_at is None]
+                if available_only:
+                    items = [item for item in items if item.is_enabled and item.is_available]
+                category.items = items
         return categories
+
+    def get_customer_menu(self, db: Session) -> list[MenuCategory]:
+        return self.list_categories_full(db, include_items=True, available_only=True)
 
     def get_category(self, db: Session, category_id: UUID) -> MenuCategory:
         category = self.category_repository.get(db, category_id)
