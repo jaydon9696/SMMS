@@ -49,7 +49,7 @@ def delete_category(category_id: UUID, db: DbDep, user: AdminUser):
 
 
 @router.get("/items", response_model=ApiResponse[list[MenuItemRead]])
-def list_items(category_id: UUID | None = None, db: DbDep):
+def list_items(db: DbDep, category_id: UUID | None = None):
     service = MenuService()
     return ApiResponse(data=service.list_items(db, category_id))
 
