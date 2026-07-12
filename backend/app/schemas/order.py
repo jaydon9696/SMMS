@@ -1,7 +1,8 @@
+from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class OrderItemCreate(BaseModel):
@@ -15,6 +16,7 @@ class OrderItemCreateWithPrice(OrderItemCreate):
 
 
 class OrderItemRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: UUID
     menu_item_id: UUID
     quantity: int
@@ -31,9 +33,6 @@ class OrderItemRead(BaseModel):
             data.menu_item_image_url = data.menu_item.image_url
         return data
 
-    class Config:
-        from_attributes = True
-
 
 class OrderCreate(BaseModel):
     table_id: UUID
@@ -47,6 +46,7 @@ class OrderUpdateStatus(BaseModel):
 
 
 class OrderRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: UUID
     order_number: str
     table_id: UUID
@@ -62,13 +62,13 @@ class OrderRead(BaseModel):
 
     @model_validator(mode='before')
     @classmethod
-    def set_table_number(cls, data):
+    def prepare_data(cls, data):
         if hasattr(data, 'table') and data.table is not None:
             data.table_number = data.table.number
+        if hasattr(data, 'created_at') and data.created_at is not None:
+            if isinstance(data.created_at, datetime):
+                data.created_at = data.created_at.isoformat()
         return data
-
-    class Config:
-        from_attributes = True
 
 
 class OrderSummary(BaseModel):

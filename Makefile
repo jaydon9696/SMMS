@@ -19,7 +19,7 @@ seed:
 	docker compose run --rm backend python scripts/seed.py
 
 test:
-	docker compose run --rm backend pytest
+	docker compose run --rm backend sh -c "pip install -e '.[dev]' && pytest"
 
 backend-shell:
 	docker compose exec backend bash

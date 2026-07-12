@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class Token(BaseModel):
@@ -13,10 +13,8 @@ class LoginRequest(BaseModel):
 
 
 class UserRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: str
     name: str
     email: str
     role: str
-
-    class Config:
-        from_attributes = True

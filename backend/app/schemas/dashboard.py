@@ -1,7 +1,7 @@
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class DashboardSummary(BaseModel):
@@ -14,14 +14,12 @@ class DashboardSummary(BaseModel):
 
 
 class LiveOrder(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: UUID
     order_number: str
     table_number: int
     status: str
     total_amount: Decimal
-
-    class Config:
-        from_attributes = True
 
 
 class TableCard(BaseModel):

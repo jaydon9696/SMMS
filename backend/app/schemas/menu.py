@@ -1,7 +1,7 @@
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class MenuCategoryCreate(BaseModel):
@@ -17,13 +17,11 @@ class MenuCategoryUpdate(BaseModel):
 
 
 class MenuCategoryRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: UUID
     name: str
     sort_order: int
     is_active: bool
-
-    class Config:
-        from_attributes = True
 
 
 class MenuItemCreate(BaseModel):
@@ -49,6 +47,7 @@ class MenuItemUpdate(BaseModel):
 
 
 class MenuItemRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: UUID
     category_id: UUID
     name: str
@@ -58,9 +57,6 @@ class MenuItemRead(BaseModel):
     is_available: bool
     is_enabled: bool
     sort_order: int
-
-    class Config:
-        from_attributes = True
 
 
 class MenuCategoryWithItems(MenuCategoryRead):

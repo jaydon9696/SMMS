@@ -35,18 +35,12 @@ class Settings(BaseSettings):
     RATE_LIMIT_ENABLED: bool = False
     RATE_LIMIT_REQUESTS_PER_MINUTE: int = 60
 
-    @field_validator("ALLOWED_HOSTS", mode="before")
-    @classmethod
-    def parse_allowed_hosts(cls, v: str) -> List[str]:
-        if isinstance(v, str):
-            return [h.strip() for h in v.split(",") if h.strip()]
-        return v
-
     @property
     def cors_origins(self) -> List[str]:
         origins = ["http://localhost", "http://localhost:3000"]
         if self.ALLOWED_HOSTS:
-            origins = list(dict.fromkeys(origins + self.ALLOWED_HOSTS))
+            hosts = [h.strip() for h in self.ALLOWED_HOSTS.split(",") if h.strip()]
+            origins = list(dict.fromkeys(origins + hosts))
         return origins
 
 

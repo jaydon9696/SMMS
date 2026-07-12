@@ -15,6 +15,7 @@ COPY backend/pyproject.toml ./
 COPY backend/app ./app
 COPY backend/alembic ./alembic
 COPY backend/alembic.ini ./
+COPY backend/tests ./tests
 COPY scripts/seed.py ./scripts/seed.py
 
 RUN pip install -e "."
