@@ -1,7 +1,7 @@
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class OrderItemCreate(BaseModel):
@@ -20,8 +20,16 @@ class OrderItemRead(BaseModel):
     quantity: int
     unit_price: Decimal
     notes: str | None
-    menu_item_name: str
-    menu_item_image_url: str | None
+    menu_item_name: str = ""
+    menu_item_image_url: str | None = None
+
+    @model_validator(mode='before')
+    @classmethod
+    def set_menu_item(cls, data):
+        if hasattr(data, 'menu_item') and data.menu_item is not None:
+            data.menu_item_name = data.menu_item.name
+            data.menu_item_image_url = data.menu_item.image_url
+        return data
 
     class Config:
         from_attributes = True
@@ -42,6 +50,7 @@ class OrderRead(BaseModel):
     id: UUID
     order_number: str
     table_id: UUID
+    table_number: int = 0
     order_type: str
     status: str
     payment_method: str
@@ -50,6 +59,13 @@ class OrderRead(BaseModel):
     total_amount: Decimal
     items: list[OrderItemRead]
     created_at: str
+
+    @model_validator(mode='before')
+    @classmethod
+    def set_table_number(cls, data):
+        if hasattr(data, 'table') and data.table is not None:
+            data.table_number = data.table.number
+        return data
 
     class Config:
         from_attributes = True

@@ -61,6 +61,11 @@ export async function fetchCategories(): Promise<MenuCategory[]> {
   return res.data.data;
 }
 
+export async function fetchCustomerMenu(): Promise<MenuCategory[]> {
+  const res = await api.get("/menu/customer");
+  return res.data.data;
+}
+
 export async function login(email: string, password: string) {
   const res = await api.post("/auth/login", { email, password });
   return res.data.data;
@@ -103,6 +108,11 @@ export async function getLiveOrders() {
 
 export async function getTables() {
   const res = await api.get("/tables");
+  return res.data.data;
+}
+
+export async function getTableByNumber(number: number) {
+  const res = await api.get(`/tables/number/${number}`);
   return res.data.data;
 }
 

@@ -28,6 +28,12 @@ def get_table(table_id: UUID, db: DbDep):
     return ApiResponse(data=service.get_table(db, table_id))
 
 
+@router.get("/number/{number}", response_model=ApiResponse[TableRead])
+def get_table_by_number(number: int, db: DbDep):
+    service = TableService()
+    return ApiResponse(data=service.get_table_by_number(db, number))
+
+
 @router.put("/{table_id}", response_model=ApiResponse[TableRead])
 def update_table(table_id: UUID, data: TableUpdate, db: DbDep, user: AdminUser):
     service = TableService()

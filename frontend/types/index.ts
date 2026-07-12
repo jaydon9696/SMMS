@@ -45,6 +45,7 @@ export interface Order {
   id: string;
   order_number: string;
   table_id: string;
+  table_number: number;
   order_type: string;
   status: string;
   payment_method: string;
