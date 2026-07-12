@@ -54,7 +54,7 @@ class MenuCategoryUpdate(BaseModel):
 
 
 class MenuCategoryResponse(MenuCategoryBase, AuditFields):
-    items: list[MenuItemResponse] = []
+    items: list[MenuItemResponse] = Field(default_factory=list)
 
 
 class ImageUploadResponse(BaseModel):

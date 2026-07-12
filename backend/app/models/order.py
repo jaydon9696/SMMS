@@ -35,8 +35,8 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         UniqueConstraint("mess_id", "idempotency_key", name="uq_orders_mess_idempotency"),
         CheckConstraint("total_amount >= 0", name="total_non_negative"),
         CheckConstraint(
-            "(source = 'table' AND table_id IS NOT NULL) OR "
-            "(source = 'standing' AND table_id IS NULL)",
+            "(source = 'TABLE' AND table_id IS NOT NULL) OR "
+            "(source = 'STANDING' AND table_id IS NULL)",
             name="source_table_consistent",
         ),
         Index("ix_orders_mess_status_created", "mess_id", "status", "created_at"),

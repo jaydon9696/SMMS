@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.enums import ORDER_STATUS_TRANSITIONS, OrderSource, OrderStatus
@@ -81,7 +82,16 @@ class OrderService:
             status_history=[OrderStatusHistory(status=OrderStatus.PENDING)],
         )
         self.session.add(order)
-        await self.session.commit()
+        try:
+            await self.session.commit()
+        except IntegrityError:
+            await self.session.rollback()
+            existing = await self.order_repository.get_by_idempotency_key(
+                mess_id, idempotency_key
+            )
+            if existing is None:
+                raise
+            return existing, False
         await self.session.refresh(order, attribute_names=["items"])
         return order, True
 

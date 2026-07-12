@@ -1,9 +1,11 @@
+import logging
 from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
 import cloudinary
 import cloudinary.uploader
+from cloudinary.exceptions import Error as CloudinaryError
 from fastapi import APIRouter, File, HTTPException, Response, UploadFile, status
 from starlette.concurrency import run_in_threadpool
 
@@ -23,6 +25,7 @@ from app.schemas.menu import (
 )
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 MAX_IMAGE_SIZE = 5 * 1024 * 1024
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
@@ -36,7 +39,7 @@ ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 async def upload_menu_image(
     user: CurrentUser, image: Annotated[UploadFile, File()]
 ) -> ApiResponse[ImageUploadResponse]:
-    if settings.cloudinary_url is None:
+    if not settings.cloudinary_url:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Image storage is not configured",
@@ -48,13 +51,17 @@ async def upload_menu_image(
         raise HTTPException(status_code=413, detail="Image must be 5 MB or smaller")
 
     cloudinary.config(cloudinary_url=settings.cloudinary_url, secure=True)
-    result = await run_in_threadpool(
-        cloudinary.uploader.upload,
-        contents,
-        folder=f"smms/{user.mess_id}/menu",
-        resource_type="image",
-        overwrite=False,
-    )
+    try:
+        result = await run_in_threadpool(
+            cloudinary.uploader.upload,
+            contents,
+            folder=f"smms/{user.mess_id}/menu",
+            resource_type="image",
+            overwrite=False,
+        )
+    except CloudinaryError as exc:
+        logger.warning("Menu image upload failed for mess %s", user.mess_id)
+        raise HTTPException(status_code=502, detail="Image upload failed") from exc
     return ApiResponse(
         data=ImageUploadResponse(
             url=result["secure_url"],

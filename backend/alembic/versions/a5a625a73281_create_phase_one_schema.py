@@ -1,8 +1,8 @@
 """create phase one schema
 
-Revision ID: 897862a5c692
+Revision ID: a5a625a73281
 Revises: 
-Create Date: 2026-07-12 11:42:22.325699
+Create Date: 2026-07-12 11:59:57.298263
 """
 from collections.abc import Sequence
 
@@ -10,7 +10,7 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision: str = '897862a5c692'
+revision: str = 'a5a625a73281'
 down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -113,7 +113,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.CheckConstraint("(source = 'table' AND table_id IS NOT NULL) OR (source = 'standing' AND table_id IS NULL)", name=op.f('ck_orders_source_table_consistent')),
+    sa.CheckConstraint("(source = 'TABLE' AND table_id IS NOT NULL) OR (source = 'STANDING' AND table_id IS NULL)", name=op.f('ck_orders_source_table_consistent')),
     sa.CheckConstraint('total_amount >= 0', name=op.f('ck_orders_total_non_negative')),
     sa.ForeignKeyConstraint(['mess_id'], ['messes.id'], name=op.f('fk_orders_mess_id_messes')),
     sa.ForeignKeyConstraint(['table_id'], ['restaurant_tables.id'], name=op.f('fk_orders_table_id_restaurant_tables')),

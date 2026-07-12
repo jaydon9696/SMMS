@@ -40,6 +40,7 @@ class OrderRepository:
         result = await self.session.scalars(
             self.with_items(
                 select(Order)
+                .options(selectinload(Order.status_history))
                 .where(Order.id == order_id, Order.mess_id == mess_id)
                 .with_for_update()
             )
